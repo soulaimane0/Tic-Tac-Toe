@@ -7,6 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic Tac Toe</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <script src="main.js" defer></script>
 </head>
 
@@ -16,22 +20,29 @@
         </div>
         <div class="game-details">
             <div class="score" id="p1">
-                <h4 class="title">player1 (X)</h4>
+                <h4 class="title">player 1 (X)</h4>
                 <h3 class="score-number" id="p1_score">3</h3>
             </div>
+            <div class="play-mood" id="playMood">
+                <div class="player" id="oneP">
+                    <i class="fa-solid fa-user"></i>
+                    <h3>1P</h3>
+                </div>
+                <div class="player" id="twoP">
+                    <i class="fa-solid fa-user-group"></i>
+                    <h3>2P</h3>
+                </div>
+            </div>
             <div class="score" id="p2">
-                <h4 class="title">player2 (O)</h4>
+                <h4 class="title" id="p2_title">player 2 (O)</h4>
                 <h3 class="score-number" id="p2_score">1</h3>
             </div>
-            <!-- <select id="playMood">
-                <option value="1P">1 Player</option>
-                <option value="2P">2 Players</option>
-            </select> -->
         </div>
     </div>
     <audio src="sounds/note-high.mp3" id="note_high"></audio>
     <audio src="sounds/note-low.mp3" id="note_low"></audio>
     <audio src="sounds/game-over.mp3" id="game_over"></audio>
+    <audio src="sounds/game-over-tie.mp3" id="game_over_tie"></audio>
 </body>
 
 </html>

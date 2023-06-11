@@ -97,6 +97,21 @@ body {
     margin-top: 0.5rem;
 }
 
-.game-details select {
-    height: 50px;
+.game-details .play-mood {
+    cursor: pointer;
+}
+
+.game-details .play-mood .player {
+    font-size: 1.9rem;
+    margin-top: 1.2rem;
+    color: #bdc3c7;
+}
+
+.game-details .play-mood .player.hidden {
+    display: none;
+}
+
+.game-details .play-mood h3 {
+    font-size: 1.6rem;
+    margin-top: 0.5rem;
 }

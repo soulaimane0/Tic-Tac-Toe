@@ -1,16 +1,16 @@
-const board = [null, null, null, null, null, null, null, null, null];
-const player1 = document.querySelector('#p1');
-const player2 = document.querySelector('#p2');
-const player1Score = document.querySelector('#p1_score');
-const player2Score = document.querySelector('#p2_score');
-const player2Title = document.querySelector('#p2_title');
-const moodElem = document.querySelector('#playMood');
-const onePlayerMood = document.querySelector('#oneP');
-const twoPlayersMood = document.querySelector('#twoP');
+const board = Array(9).fill(null);
+const player1Element = document.querySelector('#p1');
+const player2Element = document.querySelector('#p2');
+const player1ScoreElement = document.querySelector('#p1_score');
+const player2ScoreElement = document.querySelector('#p2_score');
+const player2TitleElement = document.querySelector('#p2_title');
+const moodElement = document.querySelector('#playMood');
+const onePlayerMoodElement = document.querySelector('#oneP');
+const twoPlayersMoodElement = document.querySelector('#twoP');
 
 let playerTurn = 'X';
-let p1_score = 0;
-let p2_score = 0;
+let player1Score = 0;
+let player2Score = 0;
 let isOnePlayerMood = false;
 
 // Game Sounds
@@ -19,45 +19,68 @@ const note_low = document.querySelector('#note_low');
 const game_over = document.querySelector('#game_over');
 const game_over_tie = document.querySelector('#game_over_tie');
 
-const toggleClassName = (elem, action, className) => {
-  if (action === 'add') elem.classList.add(className);
-  else if (action === 'remove') elem.classList.remove(className);
+const toggleClassName = (elem, className, add) => {
+  elem.classList.toggle(className, add);
 };
 
-toggleClassName(onePlayerMood, 'add', 'hidden');
+const restartGame = (duration) => {
+  setTimeout(() => {
+    for (let i = 0; i < board.length; i++) {
+      const square = document.getElementById(`square_${i}`);
+      square.innerHTML = '';
+      square.classList.remove('winner');
+      board[i] = null;
+    }
+    playerTurn = 'X';
+  }, duration);
+};
 
-moodElem.addEventListener('click', () => {
+toggleClassName(onePlayerMoodElement, 'hidden', true);
+const changeGameMood = () => {
+  player1Score = 0;
+  player2Score = 0;
   isOnePlayerMood = !isOnePlayerMood;
-  if (isOnePlayerMood === true) {
-    toggleClassName(onePlayerMood, 'remove', 'hidden');
-    toggleClassName(twoPlayersMood, 'add', 'hidden');
-    player2Title.textContent = 'Computer (O)';
+  restartGame(50);
+  if (isOnePlayerMood) {
+    toggleClassName(onePlayerMoodElement, 'hidden', false);
+    toggleClassName(twoPlayersMoodElement, 'hidden', true);
+    player2TitleElement.textContent = 'Computer (O)';
   } else {
-    toggleClassName(twoPlayersMood, 'remove', 'hidden');
-    toggleClassName(onePlayerMood, 'add', 'hidden');
-    player2Title.textContent = 'Player 2 (O)';
+    toggleClassName(twoPlayersMoodElement, 'hidden', false);
+    toggleClassName(onePlayerMoodElement, 'hidden', true);
+    player2TitleElement.textContent = 'Player 2 (O)';
   }
-  p1_score = 0;
-  p2_score = 0;
-  console.log('is One player mood : ', isOnePlayerMood);
-});
 
-player1Score.textContent = p1_score;
-player2Score.textContent = p2_score;
+  player1ScoreElement.textContent = player1Score.toString();
+  player2ScoreElement.textContent = player2Score.toString();
+};
 
-toggleClassName(player1, 'add', 'active');
+moodElement.addEventListener('click', () => changeGameMood());
+
+toggleClassName(player1Element, 'active', true);
 const switchPlayer = () => {
-  if (playerTurn === 'X' && !gameWinner(board)) {
+  if (playerTurn === 'X' && !gameWinner()) {
     note_high.play();
     playerTurn = 'O';
-    toggleClassName(player1, 'remove', 'active');
-    toggleClassName(player2, 'add', 'active');
-  } else if (playerTurn === 'O' && !gameWinner(board)) {
+    toggleClassName(player1Element, 'active', false);
+    toggleClassName(player2Element, 'active', true);
+  } else if (playerTurn === 'O' && !gameWinner()) {
     note_low.play();
     playerTurn = 'X';
-    toggleClassName(player2, 'remove', 'active');
-    toggleClassName(player1, 'add', 'active');
+    toggleClassName(player2Element, 'active', false);
+    toggleClassName(player1Element, 'active', true);
   }
+};
+
+const checkWinner = () => {
+  const winner = gameWinner();
+  if (winner === 'X') {
+    player1Score++;
+  } else if (winner === 'O') {
+    player2Score++;
+  }
+  player1ScoreElement.textContent = player1Score.toString();
+  player2ScoreElement.textContent = player2Score.toString();
 };
 
 const makeMove = (index, square) => {
@@ -72,7 +95,7 @@ const makeMove = (index, square) => {
 function squareClick(index) {
   const square = document.getElementById(`square_${index}`);
 
-  if (square.innerHTML == '' && !gameWinner(board)) {
+  if (square.innerHTML === '' && !gameWinner()) {
     makeMove(index, square);
 
     if (isOnePlayerMood) {
@@ -80,17 +103,19 @@ function squareClick(index) {
 
       do {
         computerIndex = Math.floor(Math.random() * board.length);
-      } while (board[computerIndex] !== null && !gameWinner(board));
-      if (!gameWinner(board)) {
+      } while (board[computerIndex] !== null && !gameWinner());
+      if (!gameWinner()) {
         const computerSquare = document.getElementById(
           `square_${computerIndex}`
         );
         setTimeout(() => {
           makeMove(computerIndex, computerSquare);
+          checkWinner();
         }, 300);
       }
     }
   }
+  if (gameWinner() && gameWinner() !== 'draw') checkWinner();
 }
 
 const createBoardSquares = () => {
@@ -108,18 +133,7 @@ const createBoardSquares = () => {
 
 createBoardSquares();
 
-const restartGame = (board) => {
-  setTimeout(() => {
-    for (let i = 0; i < board.length; i++) {
-      const square = document.getElementById(`square_${i}`);
-      square.innerHTML = '';
-      square.classList.remove('winner');
-      board[i] = null;
-    }
-  }, 2000);
-};
-
-const gameWinner = (board) => {
+function gameWinner() {
   const winningCombinations = [
     //Rows
     [0, 1, 2],
@@ -134,6 +148,8 @@ const gameWinner = (board) => {
     [2, 4, 6],
   ];
 
+  let winner = null;
+  let draw = null;
   for (const combination of winningCombinations) {
     const [a, b, c] = combination;
 
@@ -141,23 +157,26 @@ const gameWinner = (board) => {
       combination.forEach((square) => {
         document.getElementById(`square_${square}`).classList.add('winner');
       });
-      p1_score += 1 ? board[a] === 'X' : p1_score;
-      p2_score += 1 ? board[a] === 'O' : p2_score;
-      player1Score.textContent = p1_score;
-      player2Score.textContent = p2_score;
-
-      restartGame(board);
-      game_over.play();
-      return board[a];
+      winner = board[a];
+      draw = null;
+      break;
     } else if (
       !board.includes(null) &&
       board[a] !== board[b] &&
       board[a] !== board[c]
     ) {
-      game_over_tie.play();
-      restartGame(board);
-      return board[a];
+      draw = 'draw';
+      winner = null;
     }
   }
+  if (winner) {
+    game_over.play();
+    restartGame(2000);
+    return winner;
+  } else if (draw) {
+    game_over_tie.play();
+    restartGame(2000);
+    return draw;
+  }
   return null;
-};
+}
